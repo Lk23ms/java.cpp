@@ -13,6 +13,7 @@ Khóa học Java **từ cơ bản đến nâng cao**, mục tiêu cuối cùng: 
 | [04 - Minecraft Plugin (Spigot/Paper)](./04-minecraft-plugin-spigot) | Setup plugin, Command, Event, Config, Lưu dữ liệu | ✅ |
 | [05 - Minecraft Client (Fabric)](./05-minecraft-fabric-client) | Client-side mod, Mixin cơ bản, custom rendering/HUD | ✅ |
 | [06 - Dự án thực hành](./06-du-an-thuc-hanh) | Ý tưởng dự án để luyện tập tổng hợp | ✅ |
+| [07 - Thực Chiến 🐱⚡](./07-thuc-chien) | Trang web bài tập thực hành (giao diện neon), có gợi ý từng bước + đáp án tham khảo | ✅ |
 
 ## 🎯 Cách học hiệu quả
 
@@ -27,6 +28,12 @@ Khóa học Java **từ cơ bản đến nâng cao**, mục tiêu cuối cùng: 
 - IntelliJ IDEA (khuyên dùng) hoặc VS Code + Extension Pack for Java
 - Git
 - Tài khoản Mojang/Microsoft (để test mod/plugin trong game thật)
+
+## 🐱⚡ Trang "Thực Chiến"
+
+Chương [07-thuc-chien](./07-thuc-chien) là một trang web tĩnh (`index.html`) chứa các bài tập thực hành có gợi ý
+từng bước — mở trực tiếp file này bằng trình duyệt, hoặc bật **GitHub Pages** cho repo
+(Settings → Pages → Source: chọn branch `main`, thư mục `/07-thuc-chien`) để có link web xem online.
 
 ## ⚠️ Lưu ý
 

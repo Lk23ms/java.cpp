@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THỰC CHIẾN // Java × Minecraft Modding Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#08080f;
+    --bg-panel:#0f0f1c;
+    --bg-panel-2:#13132a;
+    --line:#242246;
+    --pink:#ff2e9a;
+    --cyan:#00f0ff;
+    --purple:#b26bff;
+    --lime:#c6ff3d;
+    --text:#e9e7ff;
+    --text-dim:#8d8ab8;
+    --mono: 'JetBrains Mono', monospace;
+    --disp: 'Orbitron', sans-serif;
+    --body: 'Sora', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 20% -10%, rgba(178,107,255,.18), transparent 45%),
+      radial-gradient(ellipse at 90% 10%, rgba(0,240,255,.12), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--body);
+    line-height:1.6;
+  }
+  ::selection{background:var(--pink);color:#08080f;}
+
+  a{color:var(--cyan);}
+
+  /* ---------- Scanline atmosphere ---------- */
+  .scanlines{
+    position:fixed; inset:0; pointer-events:none; z-index:1;
+    background:repeating-linear-gradient(to bottom, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
+    mix-blend-mode:overlay;
+  }
+
+  /* ---------- Hero ---------- */
+  header.hero{
+    position:relative;
+    padding:100px 24px 90px;
+    text-align:center;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .cat-logo{
+    width:120px; height:120px; margin:0 auto 28px;
+    filter: drop-shadow(0 0 14px rgba(0,240,255,.55)) drop-shadow(0 0 28px rgba(255,46,154,.35));
+  }
+  .eye{ animation: blink 5.5s infinite; transform-origin:center; }
+  @keyframes blink{
+    0%, 92%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.08); }
+  }
+  .kicker{
+    font-family:var(--mono);
+    letter-spacing:.35em;
+    font-size:12px;
+    color:var(--lime);
+    text-transform:uppercase;
+  }
+  h1.title{
+    font-family:var(--disp);
+    font-weight:900;
+    font-size:clamp(42px, 8vw, 92px);
+    margin:14px 0 8px;
+    letter-spacing:2px;
+    background:linear-gradient(90deg,var(--cyan),var(--pink) 55%, var(--purple));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-shadow:0 0 46px rgba(255,46,154,.25);
+  }
+  .subtitle{
+    max-width:640px; margin:0 auto;
+    color:var(--text-dim);
+    font-size:16.5px;
+  }
+  .subtitle b{color:var(--text); font-weight:600;}
+
+  .badge-row{
+    display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+    margin-top:30px;
+  }
+  .tag{
+    font-family:var(--mono); font-size:12px;
+    border:1px solid var(--line); border-radius:999px;
+    padding:6px 14px; color:var(--text-dim);
+  }
+
+  /* ---------- Layout ---------- */
+  main{max-width:900px; margin:0 auto; padding:70px 24px 120px; position:relative; z-index:2;}
+
+  .section-label{
+    font-family:var(--mono); color:var(--purple); letter-spacing:.2em;
+    font-size:12px; text-transform:uppercase; margin-bottom:8px;
+  }
+  h2.section-title{
+    font-family:var(--disp); font-size:28px; margin:0 0 40px;
+    color:var(--text);
+  }
+
+  /* ---------- Mission card ---------- */
+  .mission{
+    background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+    border:1px solid var(--line);
+    border-radius:14px;
+    margin-bottom:34px;
+    overflow:hidden;
+    position:relative;
+  }
+  .mission::before{
+    content:"";
+    position:absolute; inset:0 0 auto 0; height:2px;
+    background:linear-gradient(90deg,var(--cyan),var(--pink),var(--purple));
+    opacity:.8;
+  }
+  .mission-head{
+    padding:22px 26px 14px;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  }
+  .mission-id{
+    font-family:var(--mono); color:var(--text-dim); font-size:13px; letter-spacing:.15em;
+  }
+  .mission-title{
+    font-family:var(--disp); font-size:20px; margin:6px 0 0; color:var(--text);
+  }
+  .diff{
+    font-family:var(--mono); font-size:11px; padding:5px 11px; border-radius:999px;
+    white-space:nowrap; height:fit-content;
+    border:1px solid transparent;
+  }
+  .diff.easy{ color:var(--lime); border-color:rgba(198,255,61,.4); background:rgba(198,255,61,.07);}
+  .diff.mid{ color:var(--cyan); border-color:rgba(0,240,255,.4); background:rgba(0,240,255,.07);}
+  .diff.hard{ color:var(--pink); border-color:rgba(255,46,154,.4); background:rgba(255,46,154,.07);}
+
+  .mission-body{ padding:4px 26px 26px; color:var(--text-dim); font-size:15px;}
+  .mission-body p{margin:10px 0;}
+  .mission-body strong{color:var(--text);}
+  .req-list{margin:10px 0 4px; padding-left:20px;}
+  .req-list li{margin:4px 0;}
+
+  details{
+    margin-top:12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:rgba(255,255,255,.015);
+  }
+  details + details{margin-top:8px;}
+  summary{
+    cursor:pointer; list-style:none;
+    padding:11px 16px;
+    font-family:var(--mono); font-size:13px; color:var(--purple);
+    display:flex; align-items:center; gap:8px;
+    user-select:none;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{
+    content:"▸"; display:inline-block; transition:transform .15s ease; color:var(--cyan);
+  }
+  details[open] summary::before{ transform:rotate(90deg); }
+  details.solution summary{color:var(--pink);}
+  details.solution summary::before{color:var(--pink);}
+
+  .details-inner{padding:2px 16px 16px; font-size:14px;}
+
+  pre{
+    background:#0a0a16; border:1px solid var(--line); border-radius:8px;
+    padding:14px 16px; overflow-x:auto; font-family:var(--mono); font-size:12.8px;
+    color:#d7e3ff; line-height:1.55;
+  }
+  code{font-family:var(--mono);}
+  .inline-code{background:rgba(255,255,255,.07); padding:1px 6px; border-radius:4px; font-size:.92em;}
+
+  .note{
+    margin-top:16px; padding:12px 16px; border-radius:10px;
+    background:rgba(178,107,255,.08); border:1px solid rgba(178,107,255,.3);
+    font-size:13.5px; color:#cabfff;
+  }
+
+  footer{
+    text-align:center; padding:50px 24px 70px; color:var(--text-dim);
+    font-family:var(--mono); font-size:12.5px; border-top:1px solid var(--line);
+  }
+  footer a{color:var(--lime);}
+</style>
+</head>
+<body>
+<div class="scanlines"></div>
+
+<header class="hero">
+  <svg class="cat-logo" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M40 70 L60 20 L85 65 Z" fill="none" stroke="#00f0ff" stroke-width="4"/>
+    <path d="M160 70 L140 20 L115 65 Z" fill="none" stroke="#ff2e9a" stroke-width="4"/>
+    <circle cx="100" cy="105" r="62" fill="none" stroke="#b26bff" stroke-width="4"/>
+    <ellipse class="eye" cx="78" cy="100" rx="9" ry="12" fill="#00f0ff"/>
+    <ellipse class="eye" cx="122" cy="100" rx="9" ry="12" fill="#ff2e9a"/>
+    <path d="M100 118 l-6 8 h12 z" fill="#c6ff3d"/>
+    <path d="M30 118 h35 M30 128 h30 M30 108 h30" stroke="#8d8ab8" stroke-width="2"/>
+    <path d="M170 118 h-35 M170 128 h-30 M170 108 h-30" stroke="#8d8ab8" stroke-width="2"/>
+  </svg>
+
+  <div class="kicker">// java_minecraft_course / lab</div>
+  <h1 class="title">THỰC CHIẾN</h1>
+  <p class="subtitle">
+    Phòng lab thực hành sau khi học xong <b>Chương 01–05</b>. Mỗi nhiệm vụ là một tình huống modding/plugin
+    có thật, kèm <b>gợi ý theo từng cấp độ</b> và <b>đáp án tham khảo</b> — bạn tự code trước, bí thì mở gợi ý.
+  </p>
+  <div class="badge-row">
+    <span class="tag">⌨ Java + Forge/Fabric/Spigot</span>
+    <span class="tag">🐱 6 nhiệm vụ</span>
+    <span class="tag">💡 hint 3 cấp độ</span>
+  </div>
+</header>
+
+<main>
+
+  <div class="section-label">// fair-play notice</div>
+  <h2 class="section-title">Trước khi bắt đầu</h2>
+  <div class="note">
+    Phòng lab này <strong style="color:#e9e7ff">không</strong> chứa bài tập tạo cheat/hack để gian lận trên server
+    người khác (reach hack, x-ray, auto-aim...) — vi phạm ToS và gây hại cho người chơi khác.
+    Thay vào đó, các nhiệm vụ về "chỉnh sửa hành vi game" đều đi theo hướng dev tool hợp lệ hoặc anti-cheat
+    (phòng thủ) — đúng những gì server thật sự cần.
+  </div>
+
+  <div class="section-label" style="margin-top:70px;">// missions</div>
+  <h2 class="section-title">Danh sách nhiệm vụ</h2>
+
+  <!-- MISSION 01 -->
+  <section class="mission">
+    <div class="mission-head">
+      <div>
+        <div class="mission-id">MISSION 01 · FORGE ITEM</div>
+        <h3 class="mission-title">Potion Ring — Nhẫn hiệu ứng</h3>
+      </div>
+      <span class="diff easy">DỄ</span>
+    </div>
+    <div class="mission-body">
+      <p>Tạo một <strong>item mới</strong> tên "Nhẫn Cuồng Phong": khi người chơi <strong>giữ chuột phải</strong>,
+      nhân vật nhận hiệu ứng <span class="inline-code">Speed II</span> trong 5 giây, item có cooldown 10 giây.</p>
+      <ul class="req-list">
+        <li>Đăng ký item bằng <span class="inline-code">DeferredRegister</span> (ôn lại Chương 03).</li>
+        <li>Override phương thức xử lý khi dùng item (click chuột phải).</li>
+        <li>Áp dụng <span class="inline-code">MobEffectInstance</span> và cooldown bằng <span class="inline-code">ItemCooldowns</span>.</li>
+      </ul>
+
+      <details><summary>Gợi ý 1 — bắt đầu từ đâu?</summary>
+        <div class="details-inner">
+        Item tùy chỉnh hành vi cần override <span class="inline-code">use()</span> trong class kế thừa
+        <span class="inline-code">Item</span>. Xem lại cách đăng ký item ở Chương 03 mục 3.4.
+        </div>
+      </details>
+      <details><summary>Gợi ý 2 — API cần dùng</summary>
+        <div class="details-inner">
+        Dùng <span class="inline-code">player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100, 1))</span>
+        (100 tick = 5 giây, amplifier 1 = Speed II). Đặt cooldown bằng
+        <span class="inline-code">player.getCooldowns().addCooldown(this, 200)</span> (200 tick = 10 giây).
+        </div>
+      </details>
+      <details><summary>Gợi ý 3 — gần đáp án</summary>
+        <div class="details-inner">
+        Trả về <span class="inline-code">InteractionResultHolder.success(itemStack)</span> ở cuối hàm
+        <span class="inline-code">use()</span> để game biết hành động đã thành công (đồng bộ animation).
+        </div>
+      </details>
+      <details class="solution"><summary>✅ Đáp án tham khảo</summary>
+        <div class="details-inner">
+<pre><code>public class WindRingItem extends Item {
+    public WindRingItem(Properties props) { super(props); }
+
+    @Override
+    public InteractionResultHolder&lt;ItemStack&gt; use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (!level.isClientSide && !player.getCooldowns().isOnCooldown(this)) {
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100, 1));
+            player.getCooldowns().addCooldown(this, 200);
+        }
+        return InteractionResultHolder.success(stack);
+    }
+}</code></pre>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- MISSION 02 -->
+  <section class="mission">
+    <div class="mission-head">
+      <div>
+        <div class="mission-id">MISSION 02 · SPIGOT PLUGIN</div>
+        <h3 class="mission-title">Auto-Heal có Cooldown</h3>
+      </div>
+      <span class="diff easy">DỄ</span>
+    </div>
+    <div class="mission-body">
+      <p>Viết lệnh <span class="inline-code">/heal</span>: hồi đầy máu người chơi, nhưng chỉ dùng được
+      <strong>1 lần mỗi 60 giây</strong>. Nếu dùng sớm hơn, báo còn bao nhiêu giây nữa mới dùng lại được.</p>
+      <ul class="req-list">
+        <li>Lưu thời điểm dùng lệnh gần nhất theo từng người chơi (UUID → timestamp).</li>
+        <li>So sánh với thời gian hiện tại mỗi lần gọi lệnh.</li>
+      </ul>
+
+      <details><summary>Gợi ý 1</summary>
+        <div class="details-inner">
+        Dùng <span class="inline-code">Map&lt;UUID, Long&gt;</span> lưu <span class="inline-code">System.currentTimeMillis()</span>
+        của lần cuối dùng lệnh (ôn lại Chương 02 mục Collections).
+        </div>
+      </details>
+      <details><summary>Gợi ý 2</summary>
+        <div class="details-inner">
+        Tính chênh lệch: <span class="inline-code">long elapsed = (now - lastUsed) / 1000;</span> nếu
+        <span class="inline-code">elapsed &lt; 60</span> thì báo còn <span class="inline-code">60 - elapsed</span> giây.
+        </div>
+      </details>
+      <details><summary>Gợi ý 3</summary>
+        <div class="details-inner">
+        Đừng quên <strong>cập nhật lại timestamp</strong> ngay sau khi hồi máu thành công, nếu không cooldown
+        sẽ không bao giờ được set lần đầu.
+        </div>
+      </details>
+      <details class="solution"><summary>✅ Đáp án tham khảo</summary>
+        <div class="details-inner">
+<pre><code>private final Map&lt;UUID, Long&gt; lastHeal = new HashMap&lt;&gt;();
+
+@Override
+public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    if (!(sender instanceof Player player)) return false;
+
+    long now = System.currentTimeMillis();
+    long last = lastHeal.getOrDefault(player.getUniqueId(), 0L);
+    long elapsedSec = (now - last) / 1000;
+
+    if (elapsedSec &lt; 60) {
+        player.sendMessage("Chờ thêm " + (60 - elapsedSec) + " giây nữa!");
+        return true;
+    }
+
+    player.setHealth(20.0);
+    lastHeal.put(player.getUniqueId(), now);
+    player.sendMessage("Đã hồi đầy máu!");
+    return true;
+}</code></pre>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- MISSION 03 -->
+  <section class="mission">
+    <div class="mission-head">
+      <div>
+        <div class="mission-id">MISSION 03 · FABRIC CLIENT / DEV TOOL</div>
+        <h3 class="mission-title">Hitbox Debug Visualizer</h3>
+      </div>
+      <span class="diff mid">TRUNG BÌNH</span>
+    </div>
+    <div class="mission-body">
+      <p>Viết mod client vẽ <strong>khung viền hitbox</strong> của các entity xung quanh khi người chơi giữ phím
+      <span class="inline-code">F6</span> — công cụ debug hữu ích khi tự phát triển mod/entity, giống tính năng
+      "Show Hitboxes" (F3+B) nhưng do bạn tự làm.</p>
+      <ul class="req-list">
+        <li>Đăng ký keybind (ôn Chương 05 mục 5.4).</li>
+        <li>Duyệt danh sách entity trong tầm nhìn, lấy <span class="inline-code">getBoundingBox()</span>.</li>
+        <li>Vẽ outline bằng <span class="inline-code">WorldRenderEvents</span> (chỉ vẽ, không đổi collision thật).</li>
+      </ul>
+
+      <details><summary>Gợi ý 1</summary>
+        <div class="details-inner">
+        Mỗi <span class="inline-code">Entity</span> có sẵn <span class="inline-code">entity.getBoundingBox()</span>
+        trả về một <span class="inline-code">Box</span> (AABB) — đây chính là hitbox thật, bạn chỉ cần vẽ lại nó,
+        không cần tự tính toán.
+        </div>
+      </details>
+      <details><summary>Gợi ý 2</summary>
+        <div class="details-inner">
+        Dùng hook <span class="inline-code">WorldRenderEvents.LAST</span> (Fabric API) để vẽ sau khi world đã
+        render xong, tránh bị che khuất. Vẽ bằng <span class="inline-code">VertexConsumer</span> với chế độ
+        <span class="inline-code">LINES</span>.
+        </div>
+      </details>
+      <details><summary>Gợi ý 3</summary>
+        <div class="details-inner">
+        Đây là <strong>công cụ chỉ hiển thị</strong> — không gọi bất kỳ hàm nào làm thay đổi
+        <span class="inline-code">boundingBox</span> gốc của entity. Nếu thấy mình đang sửa kích thước hitbox
+        thật thay vì chỉ vẽ nó, đó là dấu hiệu đi sai hướng bài này.
+        </div>
+      </details>
+      <details class="solution"><summary>✅ Đáp án tham khảo (rút gọn)</summary>
+        <div class="details-inner">
+<pre><code>private static boolean showHitboxes = false;
+
+@Override
+public void onInitializeClient() {
+    KeyBinding toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        "key.examplemod.togglehitbox", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_F6, "category.examplemod.general"));
+
+    ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        while (toggleKey.wasPressed()) showHitboxes = !showHitboxes;
+    });
+
+    WorldRenderEvents.LAST.register(context -> {
+        if (!showHitboxes) return;
+        MinecraftClient client = MinecraftClient.getInstance();
+        for (Entity e : client.world.getEntities()) {
+            if (e == client.player) continue;
+            // Vẽ box wireframe từ e.getBoundingBox() tại vị trí camera-relative
+            WorldRenderer.drawBox(context.matrixStack(), context.consumers().getBuffer(RenderLayer.getLines()),
+                e.getBoundingBox().offset(-context.camera().getPos().x, -context.camera().getPos().y, -context.camera().getPos().z),
+                1f, 0.2f, 0.9f, 1f); // màu neon tím cho dễ nhìn :)
+        }
+    });
+}</code></pre>
+        <p style="margin-top:10px">Code rút gọn để minh họa luồng chính — bản đầy đủ cần import đúng class Fabric API tương ứng phiên bản Minecraft bạn dùng.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- MISSION 04 -->
+  <section class="mission">
+    <div class="mission-head">
+      <div>
+        <div class="mission-id">MISSION 04 · SPIGOT ANTI-CHEAT</div>
+        <h3 class="mission-title">Reach Hack Detector</h3>
+      </div>
+      <span class="diff hard">KHÓ</span>
+    </div>
+    <div class="mission-body">
+      <p>Đây là bài "anticheat" đúng nghĩa: viết plugin phát hiện người chơi <strong>đánh trúng entity khác
+      từ khoảng cách bất thường</strong> (reach hack) — kỹ năng nền tảng của mọi anti-cheat PvP thật.</p>
+      <ul class="req-list">
+        <li>Lắng nghe sự kiện <span class="inline-code">EntityDamageByEntityEvent</span>.</li>
+        <li>Tính khoảng cách giữa attacker và victim tại thời điểm đánh trúng.</li>
+        <li>Khoảng cách hợp lệ trong Minecraft vanilla ~3 block (survival) — nếu vượt ngưỡng (ví dụ 4.2 block)
+          nhiều lần liên tiếp → cảnh báo admin.</li>
+      </ul>
+
+      <details><summary>Gợi ý 1</summary>
+        <div class="details-inner">
+        <span class="inline-code">event.getDamager()</span> và <span class="inline-code">event.getEntity()</span>
+        đều có <span class="inline-code">getLocation()</span> → dùng
+        <span class="inline-code">loc1.distance(loc2)</span> để tính khoảng cách.
+        </div>
+      </details>
+      <details><summary>Gợi ý 2</summary>
+        <div class="details-inner">
+        Đừng cảnh báo ngay ở lần vượt ngưỡng đầu tiên — độ trễ mạng (lag) có thể gây sai số. Đếm số lần vi phạm
+        liên tiếp trong một khoảng thời gian ngắn (ví dụ 5 lần trong 10 giây) trước khi báo, để giảm false positive.
+        </div>
+      </details>
+      <details><summary>Gợi ý 3</summary>
+        <div class="details-inner">
+        Dùng lại kỹ thuật <span class="inline-code">Map&lt;UUID, Integer&gt;</span> đếm vi phạm (giống Mission 02),
+        và <span class="inline-code">Bukkit.getScheduler().runTaskLater(...)</span> để tự reset bộ đếm sau X giây.
+        </div>
+      </details>
+      <details class="solution"><summary>✅ Đáp án tham khảo</summary>
+        <div class="details-inner">
+<pre><code>private final Map&lt;UUID, Integer&gt; violations = new HashMap&lt;&gt;();
+private static final double MAX_REACH = 4.2; // block
+
+@EventHandler
+public void onHit(EntityDamageByEntityEvent event) {
+    if (!(event.getDamager() instanceof Player attacker)) return;
+
+    double distance = attacker.getLocation().distance(event.getEntity().getLocation());
+    if (distance &gt; MAX_REACH) {
+        int count = violations.merge(attacker.getUniqueId(), 1, Integer::sum);
+
+        if (count &gt;= 5) {
+            Bukkit.getLogger().warning("[AntiCheat] " + attacker.getName()
+                + " nghi ngờ dùng Reach Hack (khoảng cách " + String.format("%.2f", distance) + ")");
+            violations.remove(attacker.getUniqueId());
+            // TODO: thông báo cho admin online, hoặc ghi log vào file để review sau
+        }
+
+        // Tự reset bộ đếm sau 10 giây nếu không vi phạm thêm
+        Bukkit.getScheduler().runTaskLater(plugin, () -&gt;
+            violations.remove(attacker.getUniqueId()), 20L * 10);
+    }
+}</code></pre>
+        <p style="margin-top:10px">Anti-cheat thật sự (như NoCheatPlus, Grim) còn kiểm tra thêm góc nhìn (angle),
+        độ trễ ping, và nhiều pattern khác — đây là bản nền tảng để bạn hiểu nguyên lý trước khi đọc source code
+        của họ.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- MISSION 05 -->
+  <section class="mission">
+    <div class="mission-head">
+      <div>
+        <div class="mission-id">MISSION 05 · DEBUG CHALLENGE</div>
+        <h3 class="mission-title">Bắt lỗi: Plugin Kinh Tế Bị Lỗi</h3>
+      </div>
+      <span class="diff mid">TRUNG BÌNH</span>
+    </div>
+    <div class="mission-body">
+      <p>Đoạn code dưới đây có <strong>2 lỗi</strong> khiến người chơi có thể chuyển tiền âm hoặc tự nhân đôi
+      tiền của mình. Tìm và sửa cả hai lỗi.</p>
+<pre><code>public boolean pay(Player from, Player to, int amount) {
+    int fromBalance = balances.get(from.getUniqueId());
+    int toBalance = balances.get(to.getUniqueId());
+
+    balances.put(from.getUniqueId(), fromBalance - amount);
+    balances.put(to.getUniqueId(), toBalance + amount);
+    return true;
+}</code></pre>
+
+      <details><summary>Gợi ý 1</summary>
+        <div class="details-inner">
+        Thử gọi <span class="inline-code">pay(steve, steve, 100)</span> (chuyển cho chính mình) hoặc
+        <span class="inline-code">pay(steve, alex, -100)</span> — điều gì xảy ra với số dư?
+        </div>
+      </details>
+      <details><summary>Gợi ý 2</summary>
+        <div class="details-inner">
+        Lỗi 1: hàm không kiểm tra <span class="inline-code">amount &gt; 0</span> và
+        <span class="inline-code">fromBalance &gt;= amount</span> trước khi trừ tiền.
+        </div>
+      </details>
+      <details><summary>Gợi ý 3</summary>
+        <div class="details-inner">
+        Lỗi 2: nếu <span class="inline-code">from</span> và <span class="inline-code">to</span> là cùng 1 người,
+        2 dòng <span class="inline-code">put()</span> sẽ ghi đè nhau sai — dòng thứ 2 dùng lại
+        <span class="inline-code">toBalance</span> đã cũ (chưa trừ), gây nhân tiền ảo.
+        </div>
+      </details>
+      <details class="solution"><summary>✅ Đáp án tham khảo</summary>
+        <div class="details-inner">
+<pre><code>public boolean pay(Player from, Player to, int amount) {
+    if (amount &lt;= 0) return false; // chặn số âm / bằng 0
+
+    int fromBalance = balances.get(from.getUniqueId());
+    if (fromBalance &lt; amount) return false; // chặn không đủ tiền
+
+    balances.put(from.getUniqueId(), fromBalance - amount);
+
+    // Đọc lại số dư người nhận SAU KHI đã cập nhật người gửi,
+    // để xử lý đúng trường hợp from == to
+    int toBalance = balances.get(to.getUniqueId());
+    balances.put(to.getUniqueId(), toBalance + amount);
+
+    return true;
+}</code></pre>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- MISSION 06 -->
+  <section class="mission">
+    <div class="mission-head">
+      <div>
+        <div class="mission-id">MISSION 06 · FORGE WORLDGEN</div>
+        <h3 class="mission-title">Thêm Quặng Mới Vào Thế Giới</h3>
+      </div>
+      <span class="diff hard">KHÓ</span>
+    </div>
+    <div class="mission-body">
+      <p>Thêm 1 loại quặng "Ruby Ore" sinh ra tự nhiên trong hang động ở độ cao Y từ 0 đến 40, độ hiếm tương
+      đương Diamond Ore.</p>
+      <ul class="req-list">
+        <li>Đăng ký Block quặng (ôn Chương 03 mục 3.5).</li>
+        <li>Tạo <span class="inline-code">ConfiguredFeature</span> mô tả cách quặng sinh ra (kích thước vein).</li>
+        <li>Tạo <span class="inline-code">PlacedFeature</span> mô tả nơi đặt (độ cao, tần suất) và đăng ký vào biome.</li>
+      </ul>
+
+      <details><summary>Gợi ý 1</summary>
+        <div class="details-inner">
+        Forge dùng hệ thống <span class="inline-code">Feature → ConfiguredFeature → PlacedFeature</span> theo thứ tự
+        đó — mỗi lớp thêm một tầng cấu hình. Đừng nhảy thẳng vào PlacedFeature khi chưa có ConfiguredFeature.
+        </div>
+      </details>
+      <details><summary>Gợi ý 2</summary>
+        <div class="details-inner">
+        Có thể copy gần như nguyên cấu hình sinh Diamond Ore trong code gốc Minecraft (net.minecraft.data.worldgen)
+        rồi đổi Block target — không cần viết từ số 0.
+        </div>
+      </details>
+      <details><summary>Gợi ý 3</summary>
+        <div class="details-inner">
+        Đăng ký PlacedFeature vào biome bằng cách dùng
+        <span class="inline-code">BiomeLoadingEvent</span> và kiểm tra
+        <span class="inline-code">event.getCategory() == Biome.BiomeCategory.???</span> để chỉ thêm vào loại biome
+        phù hợp (ví dụ chỉ hang động/núi).
+        </div>
+      </details>
+      <details class="solution"><summary>✅ Đáp án tham khảo (khung sườn)</summary>
+        <div class="details-inner">
+<pre><code>public static final ConfiguredFeature&lt;?, ?&gt; RUBY_ORE = Feature.ORE.configured(
+    new OreConfiguration(List.of(
+        OreConfiguration.target(OreFeatures.STONE_ORE_REPLACEABLES, RUBY_BLOCK.get().defaultBlockState())
+    ), 6) // kích thước vein ~ giống Diamond
+);
+
+public static final PlacedFeature RUBY_ORE_PLACED = RUBY_ORE.placed(
+    CountPlacement.of(4),                     // 4 vein mỗi chunk
+    InSquarePlacement.spread(),
+    HeightRangePlacement.uniform(VerticalAnchor.absolute(0), VerticalAnchor.absolute(40)),
+    BiomeFilter.biome()
+);
+
+@SubscribeEvent
+public static void addFeature(BiomeLoadingEvent event) {
+    if (event.getCategory() == Biome.BiomeCategory.EXTREME_HILLS
+     || event.getCategory() == Biome.BiomeCategory.UNDERGROUND) {
+        event.getGeneration().getFeatures(GenerationStep.Decoration.UNDERGROUND_ORES)
+            .add(() -&gt; RUBY_ORE_PLACED);
+    }
+}</code></pre>
+        <p style="margin-top:10px">Đây là khung sườn đúng luồng API — chi tiết cú pháp có thể lệch nhẹ theo từng
+        phiên bản Forge, hãy đối chiếu với code Diamond Ore gốc của phiên bản bạn đang dùng.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  ⌐■_■ &nbsp; THỰC CHIẾN LAB — phần thực hành của <a href="../README.md">Java Minecraft Course</a>
+</footer>
+
+</body>
+</html>
