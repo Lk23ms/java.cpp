@@ -1,5 +1,7 @@
 # Java Minecraft Course 🎮☕
 
+### 🌐 [Mở trang web khóa học (live)](https://lk23ms.github.io/java.cpp/)  ·  🐱⚡ [Vào thẳng phòng Thực Chiến](https://lk23ms.github.io/java.cpp/07-thuc-chien/)
+
 Khóa học Java **từ cơ bản đến nâng cao**, mục tiêu cuối cùng: tự tay viết được **mod Minecraft (Forge/Fabric)**, **plugin server (Spigot/Paper)**, và hiểu cách chỉnh sửa/mở rộng client Minecraft.
 
 ## 🗺️ Lộ trình
@@ -13,7 +15,7 @@ Khóa học Java **từ cơ bản đến nâng cao**, mục tiêu cuối cùng: 
 | [04 - Minecraft Plugin (Spigot/Paper)](./04-minecraft-plugin-spigot) | Setup plugin, Command, Event, Config, Lưu dữ liệu | ✅ |
 | [05 - Minecraft Client (Fabric)](./05-minecraft-fabric-client) | Client-side mod, Mixin cơ bản, custom rendering/HUD | ✅ |
 | [06 - Dự án thực hành](./06-du-an-thuc-hanh) | Ý tưởng dự án để luyện tập tổng hợp | ✅ |
-| [07 - Thực Chiến 🐱⚡](./07-thuc-chien) | Trang web bài tập thực hành (giao diện neon), có gợi ý từng bước + đáp án tham khảo | ✅ |
+| [🐱⚡ 07 - Thực Chiến (bấm vào đây)](https://lk23ms.github.io/java.cpp/07-thuc-chien/) | Trang web bài tập thực hành (giao diện neon), có gợi ý từng bước + đáp án tham khảo | ✅ |
 
 ## 🎯 Cách học hiệu quả
 
@@ -31,15 +33,18 @@ Khóa học Java **từ cơ bản đến nâng cao**, mục tiêu cuối cùng: 
 
 ## 🐱⚡ Trang "Thực Chiến"
 
-Chương [07-thuc-chien](./07-thuc-chien) là một trang web tĩnh (`index.html`) chứa các bài tập thực hành có gợi ý
-từng bước.
+👉 **[Bấm vào đây để vào thẳng phòng Thực Chiến](https://lk23ms.github.io/java.cpp/07-thuc-chien/)** (web đã chạy live, không phải file tĩnh trên GitHub).
+
+Đây là trang web (`07-thuc-chien/index.html`) chứa các bài tập thực hành có gợi ý từng bước, ô code kiểu IDE
+và đáp án tham khảo.
 
 ## 🏠 Trang chủ tích hợp
 
-File [`index.html`](./index.html) ở gốc repo là trang chủ có **nút bấm dẫn thẳng vào phòng Thực Chiến**,
-cùng danh sách 7 chương dạng thẻ (card) để click nhanh vào từng phần. Mở trực tiếp file này bằng trình duyệt,
-hoặc bật **GitHub Pages** cho repo (Settings → Pages → Source: chọn branch `main`, thư mục `/ (root)`) để có
-link web online — khi đó nút "Vào phòng Thực Chiến" sẽ hoạt động như một website thật.
+👉 **[Bấm vào đây để vào trang chủ (web live)](https://lk23ms.github.io/java.cpp/)** — có nút bấm dẫn thẳng vào phòng Thực Chiến,
+cùng danh sách 7 chương dạng thẻ (card) để click nhanh vào từng phần.
+
+File [`index.html`](./index.html) ở gốc repo chính là mã nguồn của trang chủ này. Mở trực tiếp file này bằng
+trình duyệt cũng được, nhưng bấm link phía trên là nhanh nhất vì web đã chạy sẵn qua GitHub Pages.
 
 ## ⚠️ Lưu ý
 
