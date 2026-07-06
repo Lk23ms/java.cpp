@@ -188,6 +188,41 @@
     font-size:13.5px; color:#cabfff;
   }
 
+  /* ---------- Code editor per mission ---------- */
+  .editor-block{ margin:16px 0 4px; }
+  .editor-toolbar{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:6px;
+  }
+  .editor-label{
+    font-family:var(--mono); font-size:12px; color:var(--cyan); letter-spacing:.05em;
+  }
+  .editor-actions{ display:flex; align-items:center; gap:10px; }
+  .editor-status{
+    font-family:var(--mono); font-size:11px; color:var(--text-dim); opacity:0;
+    transition:opacity .3s ease;
+  }
+  .editor-status.show{ opacity:1; }
+  .editor-clear{
+    font-family:var(--mono); font-size:11px; color:var(--text-dim);
+    background:transparent; border:1px solid var(--line); border-radius:6px;
+    padding:4px 10px; cursor:pointer;
+  }
+  .editor-clear:hover{ color:var(--pink); border-color:var(--pink); }
+  .code-editor{
+    width:100%; min-height:170px; resize:vertical;
+    background:#0a0a16; color:#d7e3ff;
+    border:1px solid var(--line); border-radius:8px;
+    padding:14px 16px; font-family:var(--mono); font-size:12.8px; line-height:1.55;
+    tab-size:4; -moz-tab-size:4;
+    outline:none;
+  }
+  .code-editor::placeholder{ color:#4a4870; }
+  .code-editor:focus{
+    border-color:var(--cyan);
+    box-shadow:0 0 0 3px rgba(0,240,255,.12);
+  }
+
   footer{
     text-align:center; padding:50px 24px 70px; color:var(--text-dim);
     font-family:var(--mono); font-size:12.5px; border-top:1px solid var(--line);
@@ -255,6 +290,18 @@
         <li>Áp dụng <span class="inline-code">MobEffectInstance</span> và cooldown bằng <span class="inline-code">ItemCooldowns</span>.</li>
       </ul>
 
+      <div class="editor-block">
+        <div class="editor-toolbar">
+          <span class="editor-label">✍️ Vùng code của bạn</span>
+          <div class="editor-actions">
+            <span class="editor-status" data-status-for="code-m1">đã lưu</span>
+            <button type="button" class="editor-clear" data-target="code-m1">Xóa</button>
+          </div>
+        </div>
+        <textarea class="code-editor" id="code-m1" data-key="mission-01" spellcheck="false"
+          placeholder="// Viết code Java của bạn ở đây, tự động lưu vào trình duyệt khi bạn gõ..."></textarea>
+      </div>
+
       <details><summary>Gợi ý 1 — bắt đầu từ đâu?</summary>
         <div class="details-inner">
         Item tùy chỉnh hành vi cần override <span class="inline-code">use()</span> trong class kế thừa
@@ -310,6 +357,18 @@
         <li>Lưu thời điểm dùng lệnh gần nhất theo từng người chơi (UUID → timestamp).</li>
         <li>So sánh với thời gian hiện tại mỗi lần gọi lệnh.</li>
       </ul>
+
+      <div class="editor-block">
+        <div class="editor-toolbar">
+          <span class="editor-label">✍️ Vùng code của bạn</span>
+          <div class="editor-actions">
+            <span class="editor-status" data-status-for="code-m2">đã lưu</span>
+            <button type="button" class="editor-clear" data-target="code-m2">Xóa</button>
+          </div>
+        </div>
+        <textarea class="code-editor" id="code-m2" data-key="mission-02" spellcheck="false"
+          placeholder="// Viết code Java của bạn ở đây, tự động lưu vào trình duyệt khi bạn gõ..."></textarea>
+      </div>
 
       <details><summary>Gợi ý 1</summary>
         <div class="details-inner">
@@ -374,6 +433,18 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
         <li>Duyệt danh sách entity trong tầm nhìn, lấy <span class="inline-code">getBoundingBox()</span>.</li>
         <li>Vẽ outline bằng <span class="inline-code">WorldRenderEvents</span> (chỉ vẽ, không đổi collision thật).</li>
       </ul>
+
+      <div class="editor-block">
+        <div class="editor-toolbar">
+          <span class="editor-label">✍️ Vùng code của bạn</span>
+          <div class="editor-actions">
+            <span class="editor-status" data-status-for="code-m3">đã lưu</span>
+            <button type="button" class="editor-clear" data-target="code-m3">Xóa</button>
+          </div>
+        </div>
+        <textarea class="code-editor" id="code-m3" data-key="mission-03" spellcheck="false"
+          placeholder="// Viết code Java của bạn ở đây, tự động lưu vào trình duyệt khi bạn gõ..."></textarea>
+      </div>
 
       <details><summary>Gợi ý 1</summary>
         <div class="details-inner">
@@ -445,6 +516,18 @@ public void onInitializeClient() {
         <li>Khoảng cách hợp lệ trong Minecraft vanilla ~3 block (survival) — nếu vượt ngưỡng (ví dụ 4.2 block)
           nhiều lần liên tiếp → cảnh báo admin.</li>
       </ul>
+
+      <div class="editor-block">
+        <div class="editor-toolbar">
+          <span class="editor-label">✍️ Vùng code của bạn</span>
+          <div class="editor-actions">
+            <span class="editor-status" data-status-for="code-m4">đã lưu</span>
+            <button type="button" class="editor-clear" data-target="code-m4">Xóa</button>
+          </div>
+        </div>
+        <textarea class="code-editor" id="code-m4" data-key="mission-04" spellcheck="false"
+          placeholder="// Viết code Java của bạn ở đây, tự động lưu vào trình duyệt khi bạn gõ..."></textarea>
+      </div>
 
       <details><summary>Gợi ý 1</summary>
         <div class="details-inner">
@@ -519,6 +602,25 @@ public void onHit(EntityDamageByEntityEvent event) {
     return true;
 }</code></pre>
 
+      <div class="editor-block">
+        <div class="editor-toolbar">
+          <span class="editor-label">✍️ Vùng sửa lỗi của bạn</span>
+          <div class="editor-actions">
+            <span class="editor-status" data-status-for="code-m5">đã lưu</span>
+            <button type="button" class="editor-clear" data-target="code-m5">Xóa</button>
+          </div>
+        </div>
+        <textarea class="code-editor" id="code-m5" data-key="mission-05" spellcheck="false"
+          placeholder="// Dán đoạn code lỗi vào đây và sửa lại, tự động lưu vào trình duyệt khi bạn gõ...">public boolean pay(Player from, Player to, int amount) {
+    int fromBalance = balances.get(from.getUniqueId());
+    int toBalance = balances.get(to.getUniqueId());
+
+    balances.put(from.getUniqueId(), fromBalance - amount);
+    balances.put(to.getUniqueId(), toBalance + amount);
+    return true;
+}</textarea>
+      </div>
+
       <details><summary>Gợi ý 1</summary>
         <div class="details-inner">
         Thử gọi <span class="inline-code">pay(steve, steve, 100)</span> (chuyển cho chính mình) hoặc
@@ -578,6 +680,18 @@ public void onHit(EntityDamageByEntityEvent event) {
         <li>Tạo <span class="inline-code">PlacedFeature</span> mô tả nơi đặt (độ cao, tần suất) và đăng ký vào biome.</li>
       </ul>
 
+      <div class="editor-block">
+        <div class="editor-toolbar">
+          <span class="editor-label">✍️ Vùng code của bạn</span>
+          <div class="editor-actions">
+            <span class="editor-status" data-status-for="code-m6">đã lưu</span>
+            <button type="button" class="editor-clear" data-target="code-m6">Xóa</button>
+          </div>
+        </div>
+        <textarea class="code-editor" id="code-m6" data-key="mission-06" spellcheck="false"
+          placeholder="// Viết code Java của bạn ở đây, tự động lưu vào trình duyệt khi bạn gõ..."></textarea>
+      </div>
+
       <details><summary>Gợi ý 1</summary>
         <div class="details-inner">
         Forge dùng hệ thống <span class="inline-code">Feature → ConfiguredFeature → PlacedFeature</span> theo thứ tự
@@ -633,6 +747,59 @@ public static void addFeature(BiomeLoadingEvent event) {
 <footer>
   ⌐■_■ &nbsp; THỰC CHIẾN LAB — phần thực hành của <a href="../README.md">Java Minecraft Course</a>
 </footer>
+
+<script>
+(function(){
+  var PREFIX = 'thucchien:';
+
+  document.querySelectorAll('.code-editor').forEach(function(ta){
+    var key = PREFIX + ta.dataset.key;
+    var statusEl = document.querySelector('.editor-status[data-status-for="' + ta.id + '"]');
+
+    // Khôi phục code đã lưu trước đó (nếu có), giữ nguyên code mặc định nếu chưa từng lưu
+    var saved = localStorage.getItem(key);
+    if (saved !== null) ta.value = saved;
+
+    var saveTimer;
+    function showSaved(){
+      if (!statusEl) return;
+      statusEl.classList.add('show');
+      clearTimeout(statusEl._hideTimer);
+      statusEl._hideTimer = setTimeout(function(){ statusEl.classList.remove('show'); }, 1200);
+    }
+
+    ta.addEventListener('input', function(){
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(function(){
+        localStorage.setItem(key, ta.value);
+        showSaved();
+      }, 500);
+    });
+
+    // Phím Tab chèn khoảng trắng thay vì nhảy sang phần tử khác
+    ta.addEventListener('keydown', function(e){
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        var start = ta.selectionStart, end = ta.selectionEnd;
+        ta.value = ta.value.substring(0, start) + '    ' + ta.value.substring(end);
+        ta.selectionStart = ta.selectionEnd = start + 4;
+      }
+    });
+  });
+
+  document.querySelectorAll('.editor-clear').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var ta = document.getElementById(btn.dataset.target);
+      if (!ta) return;
+      if (confirm('Xóa toàn bộ code trong ô này?')) {
+        ta.value = '';
+        localStorage.removeItem(PREFIX + ta.dataset.key);
+        ta.focus();
+      }
+    });
+  });
+})();
+</script>
 
 </body>
 </html>
