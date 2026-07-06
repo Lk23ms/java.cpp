@@ -6,6 +6,8 @@
 <title>THỰC CHIẾN // Java × Minecraft Modding Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/darcula.min.css">
 <style>
   :root{
     --bg:#08080f;
@@ -188,7 +190,7 @@
     font-size:13.5px; color:#cabfff;
   }
 
-  /* ---------- Code editor per mission ---------- */
+  /* ---------- Code editor per mission (CodeMirror, giao diện kiểu IDE) ---------- */
   .editor-block{ margin:16px 0 4px; }
   .editor-toolbar{
     display:flex; align-items:center; justify-content:space-between;
@@ -197,30 +199,83 @@
   .editor-label{
     font-family:var(--mono); font-size:12px; color:var(--cyan); letter-spacing:.05em;
   }
-  .editor-actions{ display:flex; align-items:center; gap:10px; }
+  .editor-actions{ display:flex; align-items:center; gap:8px; }
   .editor-status{
     font-family:var(--mono); font-size:11px; color:var(--text-dim); opacity:0;
     transition:opacity .3s ease;
   }
   .editor-status.show{ opacity:1; }
-  .editor-clear{
+  .editor-clear, .editor-expand{
     font-family:var(--mono); font-size:11px; color:var(--text-dim);
     background:transparent; border:1px solid var(--line); border-radius:6px;
     padding:4px 10px; cursor:pointer;
   }
   .editor-clear:hover{ color:var(--pink); border-color:var(--pink); }
+  .editor-expand:hover{ color:var(--cyan); border-color:var(--cyan); }
+
+  /* Textarea gốc — chỉ hiện tạm khi CodeMirror chưa kịp load */
   .code-editor{
     width:100%; min-height:170px; resize:vertical;
     background:#0a0a16; color:#d7e3ff;
     border:1px solid var(--line); border-radius:8px;
     padding:14px 16px; font-family:var(--mono); font-size:12.8px; line-height:1.55;
-    tab-size:4; -moz-tab-size:4;
-    outline:none;
+    tab-size:4; -moz-tab-size:4; outline:none;
   }
   .code-editor::placeholder{ color:#4a4870; }
-  .code-editor:focus{
-    border-color:var(--cyan);
-    box-shadow:0 0 0 3px rgba(0,240,255,.12);
+
+  /* Giao diện CodeMirror giả lập theme Darcula của IntelliJ IDEA */
+  .CodeMirror{
+    border:1px solid var(--line); border-radius:8px;
+    height:auto; min-height:170px;
+    font-family:var(--mono); font-size:12.8px; line-height:1.55;
+  }
+  .CodeMirror-focused{ border-color:var(--cyan); box-shadow:0 0 0 3px rgba(0,240,255,.12); }
+  .CodeMirror-gutters{ border-radius:8px 0 0 8px; }
+
+  /* ---------- Overlay "IDE": bấm mở rộng -> code to ra, đề bài hiện bên cạnh ---------- */
+  .ide-overlay{
+    position:fixed; inset:0; z-index:1000; display:none;
+    background:rgba(4,4,10,.88); backdrop-filter:blur(3px);
+    padding:24px; align-items:center; justify-content:center;
+  }
+  .ide-overlay.show{ display:flex; }
+  .ide-overlay-inner{
+    width:100%; max-width:1240px; height:88vh;
+    background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+    border:1px solid var(--line); border-radius:16px;
+    display:flex; flex-direction:column; overflow:hidden;
+    box-shadow:0 24px 70px rgba(0,0,0,.6);
+  }
+  .ide-overlay-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 20px; border-bottom:1px solid var(--line); flex-shrink:0;
+  }
+  .ide-overlay-title{ font-family:var(--disp); font-size:14px; color:var(--cyan); letter-spacing:.05em;}
+  .ide-overlay-close{
+    font-family:var(--mono); font-size:12px; color:var(--text-dim);
+    background:transparent; border:1px solid var(--line); border-radius:6px;
+    padding:6px 14px; cursor:pointer;
+  }
+  .ide-overlay-close:hover{ color:var(--pink); border-color:var(--pink); }
+  .ide-overlay-body{
+    flex:1; display:grid; grid-template-columns:minmax(240px,340px) 1fr;
+    overflow:hidden;
+  }
+  .ide-overlay-problem{
+    padding:20px 22px; overflow-y:auto; border-right:1px solid var(--line);
+    font-size:13.5px; color:var(--text-dim);
+  }
+  .ide-overlay-problem h4{ font-family:var(--disp); font-size:15px; color:var(--text); margin:0 0 12px;}
+  .ide-overlay-problem strong{ color:var(--text); }
+  .ide-overlay-problem .inline-code{ background:rgba(255,255,255,.07); padding:1px 6px; border-radius:4px; }
+  .ide-overlay-problem .req-list{ padding-left:18px; }
+  .ide-overlay-problem pre{ font-size:11.5px; }
+  .ide-overlay-editor{ padding:16px; display:flex; min-width:0; }
+  .ide-overlay-editor .CodeMirror{ flex:1; height:100% !important; min-height:0; font-size:13.5px; }
+
+  @media (max-width:760px){
+    .ide-overlay-body{ grid-template-columns:1fr; grid-template-rows:auto 1fr; }
+    .ide-overlay-problem{ border-right:none; border-bottom:1px solid var(--line); max-height:34vh; }
   }
 
   footer{
@@ -282,6 +337,7 @@
       <span class="diff easy">DỄ</span>
     </div>
     <div class="mission-body">
+      <div class="mission-intro">
       <p>Tạo một <strong>item mới</strong> tên "Nhẫn Cuồng Phong": khi người chơi <strong>giữ chuột phải</strong>,
       nhân vật nhận hiệu ứng <span class="inline-code">Speed II</span> trong 5 giây, item có cooldown 10 giây.</p>
       <ul class="req-list">
@@ -289,12 +345,14 @@
         <li>Override phương thức xử lý khi dùng item (click chuột phải).</li>
         <li>Áp dụng <span class="inline-code">MobEffectInstance</span> và cooldown bằng <span class="inline-code">ItemCooldowns</span>.</li>
       </ul>
+      </div>
 
       <div class="editor-block">
         <div class="editor-toolbar">
           <span class="editor-label">✍️ Vùng code của bạn</span>
           <div class="editor-actions">
             <span class="editor-status" data-status-for="code-m1">đã lưu</span>
+            <button type="button" class="editor-expand" data-target="code-m1">⛶ Mở rộng</button>
             <button type="button" class="editor-clear" data-target="code-m1">Xóa</button>
           </div>
         </div>
@@ -351,18 +409,21 @@
       <span class="diff easy">DỄ</span>
     </div>
     <div class="mission-body">
+      <div class="mission-intro">
       <p>Viết lệnh <span class="inline-code">/heal</span>: hồi đầy máu người chơi, nhưng chỉ dùng được
       <strong>1 lần mỗi 60 giây</strong>. Nếu dùng sớm hơn, báo còn bao nhiêu giây nữa mới dùng lại được.</p>
       <ul class="req-list">
         <li>Lưu thời điểm dùng lệnh gần nhất theo từng người chơi (UUID → timestamp).</li>
         <li>So sánh với thời gian hiện tại mỗi lần gọi lệnh.</li>
       </ul>
+      </div>
 
       <div class="editor-block">
         <div class="editor-toolbar">
           <span class="editor-label">✍️ Vùng code của bạn</span>
           <div class="editor-actions">
             <span class="editor-status" data-status-for="code-m2">đã lưu</span>
+            <button type="button" class="editor-expand" data-target="code-m2">⛶ Mở rộng</button>
             <button type="button" class="editor-clear" data-target="code-m2">Xóa</button>
           </div>
         </div>
@@ -425,6 +486,7 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
       <span class="diff mid">TRUNG BÌNH</span>
     </div>
     <div class="mission-body">
+      <div class="mission-intro">
       <p>Viết mod client vẽ <strong>khung viền hitbox</strong> của các entity xung quanh khi người chơi giữ phím
       <span class="inline-code">F6</span> — công cụ debug hữu ích khi tự phát triển mod/entity, giống tính năng
       "Show Hitboxes" (F3+B) nhưng do bạn tự làm.</p>
@@ -433,12 +495,14 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
         <li>Duyệt danh sách entity trong tầm nhìn, lấy <span class="inline-code">getBoundingBox()</span>.</li>
         <li>Vẽ outline bằng <span class="inline-code">WorldRenderEvents</span> (chỉ vẽ, không đổi collision thật).</li>
       </ul>
+      </div>
 
       <div class="editor-block">
         <div class="editor-toolbar">
           <span class="editor-label">✍️ Vùng code của bạn</span>
           <div class="editor-actions">
             <span class="editor-status" data-status-for="code-m3">đã lưu</span>
+            <button type="button" class="editor-expand" data-target="code-m3">⛶ Mở rộng</button>
             <button type="button" class="editor-clear" data-target="code-m3">Xóa</button>
           </div>
         </div>
@@ -508,6 +572,7 @@ public void onInitializeClient() {
       <span class="diff hard">KHÓ</span>
     </div>
     <div class="mission-body">
+      <div class="mission-intro">
       <p>Đây là bài "anticheat" đúng nghĩa: viết plugin phát hiện người chơi <strong>đánh trúng entity khác
       từ khoảng cách bất thường</strong> (reach hack) — kỹ năng nền tảng của mọi anti-cheat PvP thật.</p>
       <ul class="req-list">
@@ -516,12 +581,14 @@ public void onInitializeClient() {
         <li>Khoảng cách hợp lệ trong Minecraft vanilla ~3 block (survival) — nếu vượt ngưỡng (ví dụ 4.2 block)
           nhiều lần liên tiếp → cảnh báo admin.</li>
       </ul>
+      </div>
 
       <div class="editor-block">
         <div class="editor-toolbar">
           <span class="editor-label">✍️ Vùng code của bạn</span>
           <div class="editor-actions">
             <span class="editor-status" data-status-for="code-m4">đã lưu</span>
+            <button type="button" class="editor-expand" data-target="code-m4">⛶ Mở rộng</button>
             <button type="button" class="editor-clear" data-target="code-m4">Xóa</button>
           </div>
         </div>
@@ -591,6 +658,7 @@ public void onHit(EntityDamageByEntityEvent event) {
       <span class="diff mid">TRUNG BÌNH</span>
     </div>
     <div class="mission-body">
+      <div class="mission-intro">
       <p>Đoạn code dưới đây có <strong>2 lỗi</strong> khiến người chơi có thể chuyển tiền âm hoặc tự nhân đôi
       tiền của mình. Tìm và sửa cả hai lỗi.</p>
 <pre><code>public boolean pay(Player from, Player to, int amount) {
@@ -601,12 +669,14 @@ public void onHit(EntityDamageByEntityEvent event) {
     balances.put(to.getUniqueId(), toBalance + amount);
     return true;
 }</code></pre>
+      </div>
 
       <div class="editor-block">
         <div class="editor-toolbar">
           <span class="editor-label">✍️ Vùng sửa lỗi của bạn</span>
           <div class="editor-actions">
             <span class="editor-status" data-status-for="code-m5">đã lưu</span>
+            <button type="button" class="editor-expand" data-target="code-m5">⛶ Mở rộng</button>
             <button type="button" class="editor-clear" data-target="code-m5">Xóa</button>
           </div>
         </div>
@@ -672,6 +742,7 @@ public void onHit(EntityDamageByEntityEvent event) {
       <span class="diff hard">KHÓ</span>
     </div>
     <div class="mission-body">
+      <div class="mission-intro">
       <p>Thêm 1 loại quặng "Ruby Ore" sinh ra tự nhiên trong hang động ở độ cao Y từ 0 đến 40, độ hiếm tương
       đương Diamond Ore.</p>
       <ul class="req-list">
@@ -679,12 +750,14 @@ public void onHit(EntityDamageByEntityEvent event) {
         <li>Tạo <span class="inline-code">ConfiguredFeature</span> mô tả cách quặng sinh ra (kích thước vein).</li>
         <li>Tạo <span class="inline-code">PlacedFeature</span> mô tả nơi đặt (độ cao, tần suất) và đăng ký vào biome.</li>
       </ul>
+      </div>
 
       <div class="editor-block">
         <div class="editor-toolbar">
           <span class="editor-label">✍️ Vùng code của bạn</span>
           <div class="editor-actions">
             <span class="editor-status" data-status-for="code-m6">đã lưu</span>
+            <button type="button" class="editor-expand" data-target="code-m6">⛶ Mở rộng</button>
             <button type="button" class="editor-clear" data-target="code-m6">Xóa</button>
           </div>
         </div>
@@ -748,56 +821,138 @@ public static void addFeature(BiomeLoadingEvent event) {
   ⌐■_■ &nbsp; THỰC CHIẾN LAB — phần thực hành của <a href="../README.md">Java Minecraft Course</a>
 </footer>
 
+<div class="ide-overlay" id="ideOverlay">
+  <div class="ide-overlay-inner">
+    <div class="ide-overlay-header">
+      <span class="ide-overlay-title" id="ideOverlayTitle">MISSION</span>
+      <button type="button" class="ide-overlay-close" id="ideOverlayClose">✕ Đóng (Esc)</button>
+    </div>
+    <div class="ide-overlay-body">
+      <div class="ide-overlay-problem" id="ideOverlayProblem"></div>
+      <div class="ide-overlay-editor" id="ideOverlaySlot"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
 <script>
 (function(){
   var PREFIX = 'thucchien:';
+  var editors = {}; // id -> { cm, homeParent, missionSection }
 
-  document.querySelectorAll('.code-editor').forEach(function(ta){
-    var key = PREFIX + ta.dataset.key;
-    var statusEl = document.querySelector('.editor-status[data-status-for="' + ta.id + '"]');
+  function initEditors(){
+    document.querySelectorAll('.code-editor').forEach(function(ta){
+      var key = PREFIX + ta.dataset.key;
+      var saved = localStorage.getItem(key);
+      if (saved !== null) ta.value = saved;
 
-    // Khôi phục code đã lưu trước đó (nếu có), giữ nguyên code mặc định nếu chưa từng lưu
-    var saved = localStorage.getItem(key);
-    if (saved !== null) ta.value = saved;
+      var cm = CodeMirror.fromTextArea(ta, {
+        mode: 'text/x-java',
+        theme: 'darcula',
+        lineNumbers: true,
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        indentUnit: 4,
+        tabSize: 4,
+        viewportMargin: Infinity,
+        extraKeys: {
+          Tab: function(cmInstance){ cmInstance.replaceSelection('    ', 'end'); }
+        }
+      });
 
-    var saveTimer;
-    function showSaved(){
-      if (!statusEl) return;
-      statusEl.classList.add('show');
-      clearTimeout(statusEl._hideTimer);
-      statusEl._hideTimer = setTimeout(function(){ statusEl.classList.remove('show'); }, 1200);
+      var statusEl = document.querySelector('.editor-status[data-status-for="' + ta.id + '"]');
+      var saveTimer;
+      function showSaved(){
+        if (!statusEl) return;
+        statusEl.classList.add('show');
+        clearTimeout(statusEl._hideTimer);
+        statusEl._hideTimer = setTimeout(function(){ statusEl.classList.remove('show'); }, 1200);
+      }
+
+      cm.on('change', function(){
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(function(){
+          localStorage.setItem(key, cm.getValue());
+          showSaved();
+        }, 500);
+      });
+
+      editors[ta.id] = {
+        cm: cm,
+        homeParent: cm.getWrapperElement().parentNode,
+        missionSection: ta.closest('.mission')
+      };
+    });
+  }
+
+  function setupClearButtons(){
+    document.querySelectorAll('.editor-clear').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var entry = editors[btn.dataset.target];
+        if (!entry) return;
+        if (confirm('Xóa toàn bộ code trong ô này?')) {
+          entry.cm.setValue('');
+          localStorage.removeItem(PREFIX + document.getElementById(btn.dataset.target).dataset.key);
+          entry.cm.focus();
+        }
+      });
+    });
+  }
+
+  function setupExpandOverlay(){
+    var overlay = document.getElementById('ideOverlay');
+    var slot = document.getElementById('ideOverlaySlot');
+    var problemBox = document.getElementById('ideOverlayProblem');
+    var titleEl = document.getElementById('ideOverlayTitle');
+    var closeBtn = document.getElementById('ideOverlayClose');
+    var current = null;
+
+    function openFor(targetId){
+      var entry = editors[targetId];
+      if (!entry) return;
+      current = entry;
+
+      var idEl = entry.missionSection.querySelector('.mission-id');
+      var titleTextEl = entry.missionSection.querySelector('.mission-title');
+      titleEl.textContent = (idEl ? idEl.textContent + ' · ' : '') + (titleTextEl ? titleTextEl.textContent : '');
+
+      var intro = entry.missionSection.querySelector('.mission-intro');
+      problemBox.innerHTML = '<h4>📋 Đề bài</h4>' + (intro ? intro.innerHTML : '');
+
+      slot.appendChild(entry.cm.getWrapperElement());
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      setTimeout(function(){ entry.cm.refresh(); entry.cm.focus(); }, 30);
     }
 
-    ta.addEventListener('input', function(){
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(function(){
-        localStorage.setItem(key, ta.value);
-        showSaved();
-      }, 500);
-    });
-
-    // Phím Tab chèn khoảng trắng thay vì nhảy sang phần tử khác
-    ta.addEventListener('keydown', function(e){
-      if (e.key === 'Tab') {
-        e.preventDefault();
-        var start = ta.selectionStart, end = ta.selectionEnd;
-        ta.value = ta.value.substring(0, start) + '    ' + ta.value.substring(end);
-        ta.selectionStart = ta.selectionEnd = start + 4;
+    function closeOverlay(){
+      if (current) {
+        current.homeParent.appendChild(current.cm.getWrapperElement());
+        setTimeout(function(){ current.cm.refresh(); }, 30);
       }
-    });
-  });
+      overlay.classList.remove('show');
+      document.body.style.overflow = '';
+      current = null;
+    }
 
-  document.querySelectorAll('.editor-clear').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var ta = document.getElementById(btn.dataset.target);
-      if (!ta) return;
-      if (confirm('Xóa toàn bộ code trong ô này?')) {
-        ta.value = '';
-        localStorage.removeItem(PREFIX + ta.dataset.key);
-        ta.focus();
-      }
+    document.querySelectorAll('.editor-expand').forEach(function(btn){
+      btn.addEventListener('click', function(){ openFor(btn.dataset.target); });
     });
-  });
+    closeBtn.addEventListener('click', closeOverlay);
+    overlay.addEventListener('click', function(e){
+      if (e.target === overlay) closeOverlay();
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && overlay.classList.contains('show')) closeOverlay();
+    });
+  }
+
+  initEditors();
+  setupClearButtons();
+  setupExpandOverlay();
 })();
 </script>
 
