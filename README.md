@@ -32,8 +32,14 @@ Khóa học Java **từ cơ bản đến nâng cao**, mục tiêu cuối cùng: 
 ## 🐱⚡ Trang "Thực Chiến"
 
 Chương [07-thuc-chien](./07-thuc-chien) là một trang web tĩnh (`index.html`) chứa các bài tập thực hành có gợi ý
-từng bước — mở trực tiếp file này bằng trình duyệt, hoặc bật **GitHub Pages** cho repo
-(Settings → Pages → Source: chọn branch `main`, thư mục `/07-thuc-chien`) để có link web xem online.
+từng bước.
+
+## 🏠 Trang chủ tích hợp
+
+File [`index.html`](./index.html) ở gốc repo là trang chủ có **nút bấm dẫn thẳng vào phòng Thực Chiến**,
+cùng danh sách 7 chương dạng thẻ (card) để click nhanh vào từng phần. Mở trực tiếp file này bằng trình duyệt,
+hoặc bật **GitHub Pages** cho repo (Settings → Pages → Source: chọn branch `main`, thư mục `/ (root)`) để có
+link web online — khi đó nút "Vào phòng Thực Chiến" sẽ hoạt động như một website thật.
 
 ## ⚠️ Lưu ý
 
