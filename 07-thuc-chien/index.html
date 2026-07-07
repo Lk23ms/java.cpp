@@ -205,13 +205,52 @@
     transition:opacity .3s ease;
   }
   .editor-status.show{ opacity:1; }
-  .editor-clear, .editor-expand{
+  .editor-clear, .editor-expand, .editor-run{
     font-family:var(--mono); font-size:11px; color:var(--text-dim);
     background:transparent; border:1px solid var(--line); border-radius:6px;
     padding:4px 10px; cursor:pointer;
   }
   .editor-clear:hover{ color:var(--pink); border-color:var(--pink); }
   .editor-expand:hover{ color:var(--cyan); border-color:var(--cyan); }
+  .editor-run{ color:var(--lime); border-color:rgba(198,255,61,.35); }
+  .editor-run:hover{ color:#08080f; background:var(--lime); border-color:var(--lime); }
+
+  /* ---------- Overlay hướng dẫn "Chạy thử" ---------- */
+  .run-overlay{
+    position:fixed; inset:0; z-index:1100; display:none;
+    background:rgba(4,4,10,.88); backdrop-filter:blur(3px);
+    padding:24px; align-items:center; justify-content:center;
+  }
+  .run-overlay.show{ display:flex; }
+  .run-card{
+    width:100%; max-width:560px; max-height:85vh; overflow-y:auto;
+    background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+    border:1px solid var(--line); border-radius:16px;
+    padding:26px 28px; box-shadow:0 24px 70px rgba(0,0,0,.6);
+  }
+  .run-card-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:6px;}
+  .run-card-title{ font-family:var(--disp); font-size:16px; color:var(--lime); }
+  .run-card-close{
+    font-family:var(--mono); font-size:12px; color:var(--text-dim);
+    background:transparent; border:1px solid var(--line); border-radius:6px;
+    padding:5px 12px; cursor:pointer; flex-shrink:0;
+  }
+  .run-card-close:hover{ color:var(--pink); border-color:var(--pink); }
+  .run-card-note{
+    font-size:13px; color:var(--text-dim); margin:10px 0 16px;
+    padding:10px 14px; border-radius:8px;
+    background:rgba(198,255,61,.06); border:1px solid rgba(198,255,61,.25);
+  }
+  .run-steps{ margin:0; padding-left:20px; color:var(--text-dim); font-size:14px; }
+  .run-steps li{ margin:8px 0; }
+  .run-steps code{ background:rgba(255,255,255,.07); padding:1px 6px; border-radius:4px; font-size:.92em; color:#d7e3ff;}
+  .run-card-actions{ display:flex; gap:10px; margin-top:22px; }
+  .run-copy-btn{
+    font-family:var(--mono); font-size:12.5px; color:#08080f;
+    background:linear-gradient(90deg,var(--cyan),var(--lime));
+    border:none; border-radius:8px; padding:9px 16px; cursor:pointer; font-weight:600;
+  }
+  .run-copy-btn.copied{ background:var(--lime); }
 
   /* Textarea gốc — chỉ hiện tạm khi CodeMirror chưa kịp load */
   .code-editor{
@@ -352,6 +391,7 @@
           <span class="editor-label">✍️ Vùng code của bạn</span>
           <div class="editor-actions">
             <span class="editor-status" data-status-for="code-m1">đã lưu</span>
+            <button type="button" class="editor-run" data-target="code-m1" data-runtype="forge">▶ Chạy thử</button>
             <button type="button" class="editor-expand" data-target="code-m1">⛶ Mở rộng</button>
             <button type="button" class="editor-clear" data-target="code-m1">Xóa</button>
           </div>
@@ -423,6 +463,7 @@
           <span class="editor-label">✍️ Vùng code của bạn</span>
           <div class="editor-actions">
             <span class="editor-status" data-status-for="code-m2">đã lưu</span>
+            <button type="button" class="editor-run" data-target="code-m2" data-runtype="spigot">▶ Chạy thử</button>
             <button type="button" class="editor-expand" data-target="code-m2">⛶ Mở rộng</button>
             <button type="button" class="editor-clear" data-target="code-m2">Xóa</button>
           </div>
@@ -502,6 +543,7 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
           <span class="editor-label">✍️ Vùng code của bạn</span>
           <div class="editor-actions">
             <span class="editor-status" data-status-for="code-m3">đã lưu</span>
+            <button type="button" class="editor-run" data-target="code-m3" data-runtype="fabric">▶ Chạy thử</button>
             <button type="button" class="editor-expand" data-target="code-m3">⛶ Mở rộng</button>
             <button type="button" class="editor-clear" data-target="code-m3">Xóa</button>
           </div>
@@ -588,6 +630,7 @@ public void onInitializeClient() {
           <span class="editor-label">✍️ Vùng code của bạn</span>
           <div class="editor-actions">
             <span class="editor-status" data-status-for="code-m4">đã lưu</span>
+            <button type="button" class="editor-run" data-target="code-m4" data-runtype="spigot">▶ Chạy thử</button>
             <button type="button" class="editor-expand" data-target="code-m4">⛶ Mở rộng</button>
             <button type="button" class="editor-clear" data-target="code-m4">Xóa</button>
           </div>
@@ -676,6 +719,7 @@ public void onHit(EntityDamageByEntityEvent event) {
           <span class="editor-label">✍️ Vùng sửa lỗi của bạn</span>
           <div class="editor-actions">
             <span class="editor-status" data-status-for="code-m5">đã lưu</span>
+            <button type="button" class="editor-run" data-target="code-m5" data-runtype="plain">▶ Chạy thử</button>
             <button type="button" class="editor-expand" data-target="code-m5">⛶ Mở rộng</button>
             <button type="button" class="editor-clear" data-target="code-m5">Xóa</button>
           </div>
@@ -757,6 +801,7 @@ public void onHit(EntityDamageByEntityEvent event) {
           <span class="editor-label">✍️ Vùng code của bạn</span>
           <div class="editor-actions">
             <span class="editor-status" data-status-for="code-m6">đã lưu</span>
+            <button type="button" class="editor-run" data-target="code-m6" data-runtype="forge">▶ Chạy thử</button>
             <button type="button" class="editor-expand" data-target="code-m6">⛶ Mở rộng</button>
             <button type="button" class="editor-clear" data-target="code-m6">Xóa</button>
           </div>
@@ -830,6 +875,23 @@ public static void addFeature(BiomeLoadingEvent event) {
     <div class="ide-overlay-body">
       <div class="ide-overlay-problem" id="ideOverlayProblem"></div>
       <div class="ide-overlay-editor" id="ideOverlaySlot"></div>
+    </div>
+  </div>
+</div>
+
+<div class="run-overlay" id="runOverlay">
+  <div class="run-card">
+    <div class="run-card-head">
+      <span class="run-card-title" id="runCardTitle">▶ Cách chạy thử thật</span>
+      <button type="button" class="run-card-close" id="runCardClose">✕ Đóng</button>
+    </div>
+    <div class="run-card-note">
+      ⚠️ Trình duyệt không có JDK/Minecraft nên không thể "bấm là chạy" — đây là các bước để test code
+      này thật sự trong game hoặc trên máy bạn.
+    </div>
+    <ol class="run-steps" id="runSteps"></ol>
+    <div class="run-card-actions">
+      <button type="button" class="run-copy-btn" id="runCopyBtn">📋 Sao chép code trong ô này</button>
     </div>
   </div>
 </div>
@@ -950,9 +1012,101 @@ public static void addFeature(BiomeLoadingEvent event) {
     });
   }
 
+  function setupRunButtons(){
+    var overlay = document.getElementById('runOverlay');
+    var stepsEl = document.getElementById('runSteps');
+    var titleEl = document.getElementById('runCardTitle');
+    var closeBtn = document.getElementById('runCardClose');
+    var copyBtn = document.getElementById('runCopyBtn');
+    var currentTargetId = null;
+
+    var GUIDES = {
+      forge: {
+        title: '▶ Chạy thử — Mod Forge',
+        steps: [
+          'Copy code trong ô rồi dán vào file <code>.java</code> tương ứng trong project Forge MDK của bạn (xem lại Chương 03 để setup nếu chưa có).',
+          'Kiểm tra lại các phần đăng ký (<code>DeferredRegister</code>, <code>RegistryObject</code>...) đã được gắn vào đúng mod event bus chưa.',
+          'Chạy <code>./gradlew runClient</code> trong terminal (hoặc nút Run trong IntelliJ) để mở Minecraft có mod của bạn.',
+          'Vào game, kiểm tra item/block/event vừa thêm có hoạt động đúng như đề bài không.'
+        ]
+      },
+      spigot: {
+        title: '▶ Chạy thử — Plugin Spigot/Paper',
+        steps: [
+          'Copy code trong ô rồi dán vào class plugin trong project Maven/Gradle Spigot-Paper (xem lại Chương 04 để setup nếu chưa có).',
+          'Đảm bảo <code>plugin.yml</code> đã khai báo đúng tên lệnh/main class liên quan.',
+          'Build ra file <code>.jar</code> (<code>mvn package</code> hoặc Gradle build), thả vào thư mục <code>plugins/</code> của server test.',
+          'Khởi động lại server, join bằng tài khoản test, thử lệnh/tình huống liên quan để kiểm tra.'
+        ]
+      },
+      fabric: {
+        title: '▶ Chạy thử — Client Mod Fabric',
+        steps: [
+          'Copy code trong ô rồi dán vào project Fabric (template fabric-example-mod, xem lại Chương 05 để setup nếu chưa có).',
+          'Kiểm tra entrypoint client trong <code>fabric.mod.json</code> đã trỏ đúng tới class này chưa.',
+          'Chạy <code>./gradlew runClient</code> để mở Minecraft có mod client của bạn.',
+          'Thử phím/tính năng vừa thêm trong game để kiểm tra.'
+        ]
+      },
+      plain: {
+        title: '▶ Chạy thử — Logic Java thuần (không cần Minecraft)',
+        steps: [
+          'Bài này chỉ là logic Java thuần (không gọi API Minecraft trực tiếp), nên chỉ cần JDK là test được, không cần Forge/Spigot.',
+          'Dán code vào 1 file <code>.java</code> tạm trên máy, hoặc dùng Scratch File trong IntelliJ.',
+          'Viết thêm một hàm <code>main()</code> nhỏ: tạo dữ liệu giả (map số dư giả lập), gọi thử hàm với vài trường hợp — số âm, tự chuyển cho chính mình, không đủ tiền — để xem code còn lỗi không.',
+          'Khi chắc chắn đúng, mới ghép lại vào plugin thật (nếu bài gốc nằm trong ngữ cảnh plugin kinh tế).'
+        ]
+      }
+    };
+
+    function open(targetId, runtype){
+      var guide = GUIDES[runtype] || GUIDES.plain;
+      currentTargetId = targetId;
+      titleEl.textContent = guide.title;
+      stepsEl.innerHTML = guide.steps.map(function(s){ return '<li>' + s + '</li>'; }).join('');
+      copyBtn.classList.remove('copied');
+      copyBtn.textContent = '📋 Sao chép code trong ô này';
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function close(){
+      overlay.classList.remove('show');
+      document.body.style.overflow = '';
+      currentTargetId = null;
+    }
+
+    document.querySelectorAll('.editor-run').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        open(btn.dataset.target, btn.dataset.runtype);
+      });
+    });
+
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', function(e){ if (e.target === overlay) close(); });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && overlay.classList.contains('show')) close();
+    });
+
+    copyBtn.addEventListener('click', function(){
+      var entry = editors[currentTargetId];
+      if (!entry) return;
+      var text = entry.cm.getValue();
+      navigator.clipboard.writeText(text).then(function(){
+        copyBtn.textContent = '✅ Đã sao chép!';
+        copyBtn.classList.add('copied');
+        setTimeout(function(){
+          copyBtn.textContent = '📋 Sao chép code trong ô này';
+          copyBtn.classList.remove('copied');
+        }, 1500);
+      });
+    });
+  }
+
   initEditors();
   setupClearButtons();
   setupExpandOverlay();
+  setupRunButtons();
 })();
 </script>
 
